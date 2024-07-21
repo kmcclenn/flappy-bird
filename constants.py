@@ -9,3 +9,4 @@ class Constants:
     PIPES_PER_TIME = 2 # number of pipes to show at a time
     PIPE_GAP = 150 # gap in pipe in pixels
     PLAYER_SIZE = 10 # radius of player in pixels
+    SCREEN_SIZE = (1280, 720) # size of screen in pixels
