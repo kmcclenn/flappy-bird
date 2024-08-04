@@ -2,7 +2,7 @@ import pygame
 from constants import Constants
 import random
 import datetime
-
+import numpy as np
 
 class Game:
 
@@ -11,7 +11,6 @@ class Game:
         self.running = True
         self.draw = draw
         self.policy = policy # a funciton that returns whether or not the agent should jump
-
 
     def run(self):
         if self.draw:
@@ -128,7 +127,7 @@ class Game:
         self.obstacle_pos = [
             Constants.SCREEN_SIZE[0] - Constants.PIPE_WIDTH,
             Constants.SCREEN_SIZE[0] * 1.5 - Constants.PIPE_WIDTH,
-        ]
+        ] # the x positions of the two obstacles
         self.gap_start = [
             random.randint(200, Constants.SCREEN_SIZE[1] - 200)
             for _ in range(Constants.PIPES_PER_TIME)
@@ -189,10 +188,41 @@ class Game:
         self.player_velocity.y = Constants.JUMP
         
     def observation(self):
-        return {
-            "player_pos": self.player_pos,
-            "obstacle_pos": self.obstacle_pos,
-            "gap_start": self.gap_start,
-            "background_speed": self.background_speed,
-            "start_time": self.start_time
-        }
+        '''
+        Returns observation in the form:
+        
+        [
+            player_pos.x, # player x position
+            player_pos.y, # player y position
+            obstacle_pos[0], # obstacle 1 x position
+            obstacle_pos[1], # obstacle 2 x position
+            gap_start[0], # gap start position for obstacle 1
+            gap_start[1], # gap start position for obstacle 2
+            background_speed, # background speed
+            start_time # start time
+        ]
+            player_pos.y, obstacle_pos[0], obstacle_pos[1], gap_start, background_speed, start_time]
+        
+        '''
+        return np.array([
+            self.player_pos.x,
+            self.player_pos.y,
+            self.obstacle_pos[0],
+            self.obstacle_pos[1],
+            self.gap_start[0],
+            self.gap_start[1],
+            self.background_speed,
+            self.start_time.timestamp()
+        ])
+        
+    def observation_space(self):
+        '''
+        Returns observation space dimensions.
+        '''
+        return [2 + 2*Constants.PIPES_PER_TIME + 2]
+    
+    def action_space(self):
+        '''
+        Returns action space dimensions
+        '''
+        return [1] # either jump or not
